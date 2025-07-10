@@ -1,0 +1,54 @@
+name: DevSecOps CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  devsecops:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Run tfsec scan
+      uses: aquasecurity/tfsec-action@v1.0.0
+      with:
+        working-directory: ./terraform
+
+    - name: Install Trivy
+      run: |
+        sudo apt-get install wget -y
+        wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.50.1_Linux-64bit.deb
+        sudo dpkg -i trivy_0.50.1_Linux-64bit.deb
+
+    - name: Trivy scan Docker image
+      run: |
+        docker build -t myapp:latest ./app
+        trivy image myapp:latest
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Set up SealedSecrets CLI (kubeseal)
+      run: |
+        wget https://github.com/bitnami-labs/sealed-secrets/releases/latest/download/kubeseal-linux-amd64 -O kubeseal
+        chmod +x kubeseal
+        sudo mv kubeseal /usr/local/bin/
+
+    - name: Apply SealedSecrets
+      run: |
+        kubectl apply -f sealed-secrets/sealed-secret.yaml
+
+    - name: Apply K8s manifests
+      run: |
+        kubectl apply -f k8s/

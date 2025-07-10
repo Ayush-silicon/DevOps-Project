@@ -1,0 +1,7 @@
+artifact_bucket_name = "my-pipeline-artifacts-unique123"
+github_owner         = "your-github-username"
+github_repo          = "your-repo-name"
+github_branch        = "main"
+github_token         = "ghp_XXXXXXXXXXXXXXXXXXXX"
+ami_id               = "ami-xxxxxxxxxxxxxxx"
+key_name             = "your-key"
