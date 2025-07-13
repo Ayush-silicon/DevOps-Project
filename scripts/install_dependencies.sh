@@ -1,3 +1,4 @@
 #!/bin/bash
-echo "Installing dependencies..."
-# Add your dependency installation commands here
+cd /home/ec2-user/app
+sudo yum install -y nodejs
+npm install
