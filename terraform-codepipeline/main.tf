@@ -92,6 +92,37 @@ resource "aws_iam_role_policy" "codebuild_s3_write_policy" {
 }
 
 # ───────────────────────────────────────────────
+# 🛡️ IAM Role for EC2 CodeDeploy
+# ───────────────────────────────────────────────
+
+resource "aws_iam_role" "ec2_codedeploy_role" {
+  name = "CodeDeployEC2ServiceRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_codedeploy_policy_attach" {
+  role       = aws_iam_role.ec2_codedeploy_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2RoleforAWSCodeDeploy"
+}
+
+resource "aws_iam_instance_profile" "codedeploy_instance_profile" {
+  name = "CodeDeployInstanceProfile"
+  role = aws_iam_role.ec2_codedeploy_role.name
+}
+
+# ───────────────────────────────────────────────
 # 🪣 S3 Bucket
 # ───────────────────────────────────────────────
 
