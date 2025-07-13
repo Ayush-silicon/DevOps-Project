@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "Starting application..."
-# Add your start script here (e.g., node app.js or pm2 start)
+cd /home/ec2-user/app
+node index.js &   # or pm2 start index.js if you use PM2
