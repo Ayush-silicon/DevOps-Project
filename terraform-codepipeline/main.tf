@@ -4,15 +4,21 @@
 
 resource "aws_iam_role" "codepipeline_role" {
   name = "codepipeline_role"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Action = "sts:AssumeRole",
-      Principal = {
-        Service = "codepipeline.amazonaws.com"
-      },
-      Effect = "Allow"
-    }]
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = [
+            "codepipeline.amazonaws.com",
+            "codedeploy.amazonaws.com"
+          ]
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
   })
 }
 
@@ -48,11 +54,7 @@ resource "aws_iam_role_policy" "codebuild_logs_policy" {
     Statement = [
       {
         Effect = "Allow",
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
+        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
         Resource = "arn:aws:logs:ap-south-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/DevOps-Project"
       }
     ]
@@ -67,11 +69,7 @@ resource "aws_iam_role_policy" "codebuild_s3_read_policy" {
     Statement = [
       {
         Effect = "Allow",
-        Action = [
-          "s3:GetObject",
-          "s3:GetObjectVersion",
-          "s3:GetBucketVersioning"
-        ],
+        Action = ["s3:GetObject", "s3:GetObjectVersion", "s3:GetBucketVersioning"],
         Resource = "arn:aws:s3:::devops-project-ayush-s3/*"
       }
     ]
@@ -86,10 +84,7 @@ resource "aws_iam_role_policy" "codebuild_s3_write_policy" {
     Statement = [
       {
         Effect = "Allow",
-        Action = [
-          "s3:PutObject",
-          "s3:PutObjectAcl"
-        ],
+        Action = ["s3:PutObject", "s3:PutObjectAcl"],
         Resource = "arn:aws:s3:::devops-project-ayush-s3/*"
       }
     ]
@@ -168,7 +163,7 @@ resource "aws_codedeploy_deployment_group" "my_deployment_group" {
     ec2_tag_filter {
       key   = "Name"
       type  = "KEY_AND_VALUE"
-      value = "MyAppInstance"  # 🏷️ Tag this on your EC2 instance
+      value = "MyAppInstance"
     }
   }
 
