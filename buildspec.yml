@@ -2,12 +2,19 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      nodejs: 14
     commands:
-      - echo "No dependencies to install"
+      - echo Installing dependencies...
+      - npm install
+
   build:
     commands:
-      - echo "Running build phase..."
-      # Add your actual build/test/deploy commands here
+      - echo Build step (optional, skipping)
+
 artifacts:
   files:
-    - '**/*'
+    - appspec.yml
+    - scripts/**
+    - '**/*.js'
+    - package.json
